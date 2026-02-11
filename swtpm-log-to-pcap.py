@@ -13,8 +13,8 @@ SERVER_PORT = 2321
 CLIENT_PORT = 50000
 CLIENT_SEQ = randint(0, 2 ** 31)
 SERVER_SEQ = randint(0, 2 ** 31)
-REQUEST = 'SWTPM_IO_Read'
-RESPONSE = 'SWTPM_IO_Write'
+REQUEST = ['SWTPM_IO_Read', 'Ctrl Cmd']
+RESPONSE = ['SWTPM_IO_Write', 'Ctrl Rsp']
 
 
 def req(data: bytes):
@@ -130,6 +130,15 @@ def tcp_teardown():
     PACKETS.append(IP(src=LOCALHOST, dst=LOCALHOST) / TCP(sport=CLIENT_PORT, dport=SERVER_PORT, flags='A',
                                                           seq=CLIENT_SEQ, ack=SERVER_SEQ))
 
+def has_codeword(line: str, codewords) -> bool:
+    """Returns True if the line contains at least one of the codewordsm"""
+    contains_codeword = False
+    for codeword in codewords:
+        if codeword in line:
+            contains_codeword = True
+
+    return contains_codeword
+
 
 def add_io(is_req: bool, buffer: list):
     """Adds the IO to the packet list"""
@@ -156,7 +165,7 @@ def convert_log(log_fn: str):
                 add_io(is_req, buffer)
                 buffer.clear()
                 buffer_length = 0
-            if REQUEST in log or RESPONSE in log:
+            if has_codeword(log, REQUEST + RESPONSE):
                 # Case where a new REQUEST or RESPONSE header begins
                 if len(buffer) != buffer_length:
                     # If we are now handling a new REQUEST or RESPONSE, but we didn't get all the bytes
@@ -167,7 +176,7 @@ def convert_log(log_fn: str):
                     buffer.clear()
 
                 # Now handling new IO operation
-                is_req = REQUEST in log
+                is_req = has_codeword(log, REQUEST)
                 buffer_length = get_log_len(log)
             else:
                 # All other cases assumed to contain REQUEST/RESPONSE bytes
