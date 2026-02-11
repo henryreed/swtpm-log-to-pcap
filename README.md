@@ -37,7 +37,15 @@ pip install -r requirements.txt
 
 ### Log compatibility
 
-This script assumes there are three types of lines in the log file:
+This script assumes there are five types of lines in the log file:
+
+**Ctrl Cmd**
+
+`Ctrl Cmd: length 4`
+
+**Ctrl Rsp**
+
+`Ctrl Rsp: length 4`
 
 **SWTPM_IO_READ**
 
