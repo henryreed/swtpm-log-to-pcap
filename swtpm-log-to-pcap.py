@@ -131,7 +131,7 @@ def tcp_teardown():
                                                           seq=CLIENT_SEQ, ack=SERVER_SEQ))
 
 def has_codeword(line: str, codewords) -> bool:
-    """Returns True if the line contains at least one of the codewordsm"""
+    """Returns True if the line contains at least one of the codewords"""
     contains_codeword = False
     for codeword in codewords:
         if codeword in line:
